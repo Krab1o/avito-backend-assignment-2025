@@ -3,14 +3,15 @@ package service
 import (
 	"context"
 
-	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/transaction/model"
+	buyingModel "github.com/Krab1o/avito-backend-assignment-2025/internal/service/buying/model"
+	transactionModel "github.com/Krab1o/avito-backend-assignment-2025/internal/service/transaction/model"
 )
 
 type TransactionService interface {
-	SendCoin(context.Context, *model.Transaction) error
-	Info(context.Context) (*model.Info, error)
+	SendCoin(context.Context, *transactionModel.Transaction) error
+	Info(context.Context) (*transactionModel.Info, error)
 }
 
 type BuyingService interface {
-	Buy(ctx context.Context, itemName string) error
+	Buy(context.Context, *buyingModel.Buying) error
 }
