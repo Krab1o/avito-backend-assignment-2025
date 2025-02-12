@@ -23,8 +23,8 @@ type pgConfig struct {
     DBName   string
 }
 
+//TODO: Add validation
 func NewPGConfig() config.PGConfig {
-	//TODO: Add validation
 	host := os.Getenv(pgHostEnvName)
 	port := os.Getenv(pgPortEnvName)
 	user := os.Getenv(pgUserEnvName)
@@ -40,8 +40,9 @@ func NewPGConfig() config.PGConfig {
 	}
 }
 
+//TODO: change DSN format
 func (c *pgConfig) DSN() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s",
 		c.Host,
 		c.Port,
 		c.User,

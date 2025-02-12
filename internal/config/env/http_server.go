@@ -17,6 +17,7 @@ type httpConfig struct {
 	Port	string
 }
 
+//TODO: Add validation
 func NewHTTPConfig() config.HTTPConfig {
 	host := os.Getenv(httpHostEnvName)
 	port := os.Getenv(httpPortEnvName)
