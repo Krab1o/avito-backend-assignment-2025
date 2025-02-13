@@ -2,8 +2,7 @@ package model
 
 type User struct {
 	ID				int64
-	Username 		string
-	PasswordHash 	string
+	Creds 			UserCreds
 	Coins 			int
 }
 

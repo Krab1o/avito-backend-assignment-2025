@@ -18,6 +18,6 @@ type InventoryRepository interface {
 
 type UserRepository interface {
 	Info(ctx context.Context) (*userModel.Info, error)
-	FindUser(ctx context.Context, creds *userModel.UserCreds) (*userModel.User, error)
-	CreateUser(ctx context.Context) error
+	FindUserCreds(ctx context.Context, creds *userModel.UserCreds) (*userModel.UserCreds, error)
+	CreateUser(ctx context.Context, creds *userModel.User) (int64, error)
 }

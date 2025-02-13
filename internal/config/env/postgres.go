@@ -1,6 +1,7 @@
 package env
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -23,14 +24,28 @@ type pgConfig struct {
     DBName   string
 }
 
-//TODO: Add validation
-//TODO: Return error
-func NewPGConfig() config.PGConfig {
+func NewPGConfig() (config.PGConfig, error) {
+	errorMessage := "%s is empty or not read"
 	host := os.Getenv(pgHostEnvName)
+	if len(host) == 0 {
+		return nil, errors.New(fmt.Sprintf(errorMessage, pgHostEnvName))
+	}
 	port := os.Getenv(pgPortEnvName)
+	if len(host) == 0 {
+		return nil, errors.New(fmt.Sprintf(errorMessage, pgPortEnvName))
+	}
 	user := os.Getenv(pgUserEnvName)
+	if len(host) == 0 {
+		return nil, errors.New(fmt.Sprintf(errorMessage, pgUserEnvName))
+	}
 	password := os.Getenv(pgPasswordEnvName)
+	if len(host) == 0 {
+		return nil, errors.New(fmt.Sprintf(errorMessage, pgPasswordEnvName))
+	}
 	dbname := os.Getenv(pgDatabaseEnvName)
+	if len(host) == 0 {
+		return nil, errors.New(fmt.Sprintf(errorMessage, pgDatabaseEnvName))
+	}
 
 	return &pgConfig{
 		Host : host,
@@ -38,7 +53,7 @@ func NewPGConfig() config.PGConfig {
 		User : user,
 		Password: password,
 		DBName: dbname,
-	}
+	}, nil
 }
 
 func (c *pgConfig) DSN() string {

@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TABLE users (
+CREATE TABLE user_ (
     id SERIAL PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
@@ -7,4 +7,4 @@ CREATE TABLE users (
 );
 
 -- +goose Down
-DROP TABLE users;
+DROP TABLE user_;

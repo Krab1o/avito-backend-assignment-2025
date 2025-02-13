@@ -34,7 +34,7 @@ const (
 	errorParametersNotAllowed = "Query parameters are not allowed"
 )
 
-func rejectQueryParamsMiddleware(c *gin.Context) {
+func checkParamsMiddleware(c *gin.Context) {
 	if c.Request.URL.RawQuery != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"errors": errorParametersNotAllowed})
 		c.Abort()
@@ -48,8 +48,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load config, %v", err)
 	}
-	httpConfig := env.NewHTTPConfig()
-	pgConfig := env.NewPGConfig()
+	httpConfig, err := env.NewHTTPConfig()
+	if err != nil {
+		log.Fatalf("Failed to load http config, %v", err)
+	}
+	jwtConfig, err := env.NewJWTConfig()
+	if err != nil {
+		log.Fatalf("Failed to load jwt config, %v", err)
+	}
+	pgConfig, err := env.NewPGConfig()
+	log.Println(jwtConfig)
 	//TODO: REFACTOR
 	// POSTGRES CODE STARTED
 	ctx := context.Background()
@@ -73,7 +81,7 @@ func main() {
 	transactionService := serviceTransaction.NewService(transactionRepository)
 	userService := serviceUser.NewService(userRepository)
 	buyingService := serviceBuying.NewService(inventoryRepository)
-	authService := serviceAuth.NewHandler(userRepository)
+	authService := serviceAuth.NewHandler(userRepository, jwtConfig)
 
 	// api
 	transactionHandler := apiTransaction.NewHandler(transactionService)
@@ -87,9 +95,11 @@ func main() {
 	s.POST(authPath, authHandler.Auth)
 
 	//ADD AUTH MIDDLEWARE TO THIS ENDPOINTS
-	s.GET(infoPath, rejectQueryParamsMiddleware, userHandler.Info)
-	s.POST(sendCoinPath, rejectQueryParamsMiddleware, transactionHandler.SendCoin)
+	s.GET(infoPath, checkParamsMiddleware, userHandler.Info)
+	s.POST(sendCoinPath, checkParamsMiddleware, transactionHandler.SendCoin)
 	s.GET(buyItemPath, buyingHandler.Buy)
+
+	//TODO: think of graceful shutdown handling
 	if err := s.Run(httpConfig.Address()); err != nil {
 		log.Println("Server shutdown:", err)
 	}

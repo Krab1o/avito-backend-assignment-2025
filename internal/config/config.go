@@ -7,3 +7,7 @@ type HTTPConfig interface {
 type PGConfig interface {
 	DSN() string
 }
+
+type JWTConfig interface {
+	Secret() string
+}

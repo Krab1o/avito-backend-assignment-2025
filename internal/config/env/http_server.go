@@ -1,6 +1,8 @@
 package env
 
 import (
+	"errors"
+	"fmt"
 	"net"
 	"os"
 
@@ -17,16 +19,21 @@ type httpConfig struct {
 	Port	string
 }
 
-//TODO: Add validation
-//TODO: Return error
-func NewHTTPConfig() config.HTTPConfig {
+func NewHTTPConfig() (config.HTTPConfig, error) {
+	errorMessage := "%s is empty or not read"
 	host := os.Getenv(httpHostEnvName)
+	if len(host) == 0 {
+		return nil, errors.New(fmt.Sprintf(errorMessage, httpHostEnvName))
+	}
 	port := os.Getenv(httpPortEnvName)
+	if len(port) == 0 {
+		return nil, errors.New(fmt.Sprintf(errorMessage, httpPortEnvName))
+	}
 	
 	return &httpConfig{
 		Host: host,
 		Port: port,
-	}
+	}, nil
 }
 
 func (c *httpConfig) Address() string {
