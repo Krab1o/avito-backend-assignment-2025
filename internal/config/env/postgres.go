@@ -24,6 +24,7 @@ type pgConfig struct {
 }
 
 //TODO: Add validation
+//TODO: Return error
 func NewPGConfig() config.PGConfig {
 	host := os.Getenv(pgHostEnvName)
 	port := os.Getenv(pgPortEnvName)
@@ -40,7 +41,6 @@ func NewPGConfig() config.PGConfig {
 	}
 }
 
-//TODO: change DSN format
 func (c *pgConfig) DSN() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s",
 		c.Host,

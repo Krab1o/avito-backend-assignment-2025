@@ -1,8 +1,8 @@
 package converter
 
 import (
-	dtoModel "github.com/Krab1o/avito-backend-assignment-2025/internal/api/transaction/dto"
-	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/transaction/model"
+	dtoModel "github.com/Krab1o/avito-backend-assignment-2025/internal/api/user/dto"
+	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/info/model"
 )
 
 func InfoDTOToService(dto *dtoModel.Info) *model.Info {

@@ -1,8 +1,8 @@
 package converter
 
 import (
-	repoModel "github.com/Krab1o/avito-backend-assignment-2025/internal/repository/transaction/model"
-	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/transaction/model"
+	repoModel "github.com/Krab1o/avito-backend-assignment-2025/internal/repository/user/model"
+	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/info/model"
 )
 
 func InfoServiceToRepo(model *model.Info) *repoModel.Info {
@@ -39,7 +39,6 @@ func InfoServiceToRepo(model *model.Info) *repoModel.Info {
 		},
 	}
 }
-
 
 func InfoRepoToService(repoModel *repoModel.Info) *model.Info {
 	inventory := make([]model.Inventory, len(repoModel.Inventory))
