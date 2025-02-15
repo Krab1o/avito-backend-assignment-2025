@@ -69,7 +69,7 @@ func main() {
 
 	// services
 	transactionService := serviceTransaction.NewService(transactionRepository, userRepository)
-	userService := serviceUser.NewService(userRepository)
+	userService := serviceUser.NewService(userRepository, transactionRepository, inventoryRepository)
 	buyingService := serviceBuying.NewService(inventoryRepository, userRepository, merchRepository)
 	authService := serviceAuth.NewHandler(userRepository, jwtConfig)
 

@@ -14,14 +14,14 @@ import (
 func (s *serv) SendCoin(ctx context.Context, newTransaction *model.Transaction) error {	
 	var sender *repoModel.User
 	var receiver *repoModel.User
-	s.userRepo.WithTransaction(ctx, func(tx pgx.Tx) error {
+	return s.userRepo.WithTransaction(ctx, func(tx pgx.Tx) error {
 		var err error
 		//TODO: better do using goroutines (parallel reading)
-		receiver, err = s.userRepo.FindUserByUsername(ctx, tx, newTransaction.ToUser)
+		receiver, err = s.userRepo.GetUserByUsername(ctx, tx, newTransaction.ToUser)
 		if err != nil {
 			return errs.NewServiceError(service.MessageInternalError, err)
 		}
-		sender, err = s.userRepo.FindUserByID(ctx, tx, newTransaction.FromUser)
+		sender, err = s.userRepo.GetUserByID(ctx, tx, newTransaction.FromUser)
 		if err != nil {
 			return errs.NewServiceError(service.MessageInternalError, err)
 		}
@@ -29,8 +29,12 @@ func (s *serv) SendCoin(ctx context.Context, newTransaction *model.Transaction) 
 			return errs.NewSemanticError(service.MessageUserNotFound, err)
 		}
 		//business logic check
+		//TODO: maybe move to validation
 		if sender.Coins < newTransaction.Amount {
 			return errs.NewSemanticError(service.MessageNotEnoughCoins, err)
+		}
+		if newTransaction.Amount <= 0 {
+			return errs.NewSemanticError(service.MessageZeroTransfer, err)
 		}
 		if sender.ID == receiver.ID {
 			return errs.NewSemanticError(service.MessageSelfSending, err)
@@ -50,5 +54,4 @@ func (s *serv) SendCoin(ctx context.Context, newTransaction *model.Transaction) 
 		}
 		return nil
 	})
-	return nil
 }

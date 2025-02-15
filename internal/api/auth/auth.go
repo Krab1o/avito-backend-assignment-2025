@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//TODO: handler errors
 //TODO: validation
 func (h *Handler) Auth(c *gin.Context) {
 	c.Header("Content-Type", "application/json")

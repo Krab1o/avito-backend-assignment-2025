@@ -6,3 +6,5 @@ type Buying struct {
 	MerchID  int64
 	Quantity int
 }
+
+type Inventory map[string]int

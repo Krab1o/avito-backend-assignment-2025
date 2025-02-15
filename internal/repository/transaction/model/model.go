@@ -5,3 +5,8 @@ type Transaction struct {
 	ReceiverID 	int64
 	Amount 		int
 }
+
+type UserTransaction struct {
+	Username string
+	Amount int
+}

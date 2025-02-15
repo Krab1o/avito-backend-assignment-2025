@@ -2,13 +2,11 @@ package model
 
 type Info struct {
 	Coins       int         
-	Inventory   []Inventory 
+	Inventory   Inventory
 	CoinHistory CoinHistory
 }
-type Inventory struct {
-	Type     string
-	Quantity int
-}
+type Inventory map[string]int
+
 type Received struct {
 	FromUser string
 	Amount   int

@@ -7,10 +7,18 @@ import (
 
 type serv struct {
 	userRepo repository.UserRepository
+	transactionRepo repository.TransactionRepository
+	inventoryRepo repository.InventoryRepository
 }
 
-func NewService(usr repository.UserRepository) service.InfoService {
+func NewService(
+		usr repository.UserRepository,
+		tr repository.TransactionRepository,
+		inv repository.InventoryRepository,
+	) service.InfoService {
 	return &serv{
 		userRepo: usr,
+		transactionRepo: tr,
+		inventoryRepo: inv,
 	}
 }

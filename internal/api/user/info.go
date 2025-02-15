@@ -1,7 +1,6 @@
 package user
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/api"
@@ -9,17 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//TODO: add validation
 func (h *Handler) Info(c *gin.Context) {
+	c.Header("Content-Type", "application/json")
+	id := api.ConversionID(c)
 	ctx := c.Request.Context()
-	info, err := h.infoService.Info(ctx)
+	infoService, err := h.infoService.Info(ctx, id)
 	if err != nil {
-		log.Printf("Handler info: %v", err)
-		c.Header("Content-Type", "application/json")
-		c.JSON(http.StatusInternalServerError, gin.H{api.FieldError: api.ErrorInternalServerError})
+		api.HandleServiceError(c, err)
 		return
 	}
-	//TODO: everything before is validation
-	dtoInfo := converter.InfoServiceToDTO(info)
-	c.JSON(http.StatusOK, dtoInfo)
+	infoDTO := converter.InfoServiceToDTO(infoService)
+	c.JSON(http.StatusOK, infoDTO)
 	return
 }

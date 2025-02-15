@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/service"
@@ -16,8 +17,7 @@ import (
 const startCoins = 1000
 
 func generateJWT(userID int64, jwtSecret []byte, jwtTimeout int) (string, error) {
-    expirationTime := time.Now().Add(time.Duration(jwtTimeout) * 30)
-    
+    expirationTime := time.Now().Add(time.Duration(jwtTimeout) * time.Minute)
     claims := shared.Claims{
         UserID: userID,
         RegisteredClaims: jwt.RegisteredClaims{
@@ -39,7 +39,7 @@ func verifyPassword(hashedPassword string, candidatePassword string) bool {
 // Concerns separation violation for the sake of efficiency
 func (s *serv) Auth(ctx context.Context, userCreds *model.UserCreds) (string, error) {
 	var jwtUserID int64
-	repoData, err := s.userRepository.FindUserByUsername(ctx, nil, userCreds.Username)
+	repoData, err := s.userRepository.GetUserByUsername(ctx, nil, userCreds.Username)
 	if err != nil {
 		return "", errs.NewServiceError(service.MessageInternalError, err)
 	}
@@ -66,6 +66,7 @@ func (s *serv) Auth(ctx context.Context, userCreds *model.UserCreds) (string, er
 		}
 		jwtUserID = repoData.ID
 	}
+	log.Println(s.jwtConfig.Timeout())
 	token, err := generateJWT(jwtUserID, s.jwtConfig.Secret(), s.jwtConfig.Timeout())
 	if err != nil {
 		return "", errs.NewServiceError(service.MessageInternalError, err)

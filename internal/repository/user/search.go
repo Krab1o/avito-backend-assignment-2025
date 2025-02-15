@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *repo) FindUserByID(ctx context.Context, tx pgx.Tx, userID int64) (*model.User, error) {
+func (r *repo) GetUserByID(ctx context.Context, tx pgx.Tx, userID int64) (*model.User, error) {
 	builder := sq.Select(
 		repository.UserIdColumn,
 		repository.UserUsernameColumn,
@@ -47,7 +47,7 @@ func (r *repo) FindUserByID(ctx context.Context, tx pgx.Tx, userID int64) (*mode
 	return newUser, nil
 }
 
-func (r *repo) FindUserByUsername(ctx context.Context, tx pgx.Tx, username string) (*model.User, error) {
+func (r *repo) GetUserByUsername(ctx context.Context, tx pgx.Tx, username string) (*model.User, error) {
 	builder := sq.Select(
 		repository.UserIdColumn,
 		repository.UserUsernameColumn,
