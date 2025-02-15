@@ -1,7 +1,7 @@
 package model
 
-//TODO: Adapt model to repo layer
 type Transaction struct {
-	ToUser string
-	Amount int
+	SenderID 	int64
+	ReceiverID 	int64
+	Amount 		int
 }

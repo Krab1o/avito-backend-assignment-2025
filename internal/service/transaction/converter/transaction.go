@@ -5,16 +5,10 @@ import (
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/transaction/model"
 )
 
-func TransactionServiceToRepo(model *model.Transaction) *repoModel.Transaction {
+func TransactionServiceToRepo(model *model.Transaction, receiverID int64) *repoModel.Transaction {
 	return &repoModel.Transaction{
-		ToUser: model.ToUser,
+		SenderID: model.FromUser,
+		ReceiverID: receiverID,
 		Amount: model.Amount,
-	}
-}
-
-func TransactionRepoToService(repoModel *model.Transaction) *model.Transaction {
-	return &model.Transaction{
-		ToUser: repoModel.ToUser,
-		Amount: repoModel.Amount,
 	}
 }

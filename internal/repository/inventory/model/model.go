@@ -1,5 +1,8 @@
 package model
 
 type Buying struct {
-	Name string
+	ID		 int64
+	BuyerID  int64
+	MerchID  int64
+	Quantity int
 }

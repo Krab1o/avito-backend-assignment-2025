@@ -20,14 +20,13 @@ type httpConfig struct {
 }
 
 func NewHTTPConfig() (config.HTTPConfig, error) {
-	errorMessage := "%s is empty or not read"
 	host := os.Getenv(httpHostEnvName)
 	if len(host) == 0 {
-		return nil, errors.New(fmt.Sprintf(errorMessage, httpHostEnvName))
+		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, httpHostEnvName))
 	}
 	port := os.Getenv(httpPortEnvName)
 	if len(port) == 0 {
-		return nil, errors.New(fmt.Sprintf(errorMessage, httpPortEnvName))
+		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, httpPortEnvName))
 	}
 	
 	return &httpConfig{

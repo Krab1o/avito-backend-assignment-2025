@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 
 	apiAuth "github.com/Krab1o/avito-backend-assignment-2025/internal/api/auth"
 	apiBuying "github.com/Krab1o/avito-backend-assignment-2025/internal/api/buying"
@@ -11,7 +10,10 @@ import (
 	apiUser "github.com/Krab1o/avito-backend-assignment-2025/internal/api/user"
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/config"
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/config/env"
+	middlewareAuth "github.com/Krab1o/avito-backend-assignment-2025/internal/middleware/auth"
+	middlewareParams "github.com/Krab1o/avito-backend-assignment-2025/internal/middleware/params"
 	repositoryInventory "github.com/Krab1o/avito-backend-assignment-2025/internal/repository/inventory"
+	repositoryMerch "github.com/Krab1o/avito-backend-assignment-2025/internal/repository/merch"
 	repositoryTransaction "github.com/Krab1o/avito-backend-assignment-2025/internal/repository/transaction"
 	repositoryUser "github.com/Krab1o/avito-backend-assignment-2025/internal/repository/user"
 	serviceAuth "github.com/Krab1o/avito-backend-assignment-2025/internal/service/auth"
@@ -30,19 +32,6 @@ const (
 	authPath = "/api/auth"
 )
 
-const (
-	errorParametersNotAllowed = "Query parameters are not allowed"
-)
-
-func checkParamsMiddleware(c *gin.Context) {
-	if c.Request.URL.RawQuery != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"errors": errorParametersNotAllowed})
-		c.Abort()
-		return
-	}
-	c.Next()
-}
-
 func main() {
 	err := config.Load(envPath)
 	if err != nil {
@@ -57,7 +46,7 @@ func main() {
 		log.Fatalf("Failed to load jwt config, %v", err)
 	}
 	pgConfig, err := env.NewPGConfig()
-	log.Println(jwtConfig)
+
 	//TODO: REFACTOR
 	// POSTGRES CODE STARTED
 	ctx := context.Background()
@@ -76,11 +65,12 @@ func main() {
 	transactionRepository := repositoryTransaction.NewRepository(pool)
 	userRepository := repositoryUser.NewRepository(pool)
 	inventoryRepository := repositoryInventory.NewRepository(pool)
+	merchRepository := repositoryMerch.NewRepository(pool)
 
 	// services
-	transactionService := serviceTransaction.NewService(transactionRepository)
+	transactionService := serviceTransaction.NewService(transactionRepository, userRepository)
 	userService := serviceUser.NewService(userRepository)
-	buyingService := serviceBuying.NewService(inventoryRepository)
+	buyingService := serviceBuying.NewService(inventoryRepository, userRepository, merchRepository)
 	authService := serviceAuth.NewHandler(userRepository, jwtConfig)
 
 	// api
@@ -89,18 +79,19 @@ func main() {
 	authHandler := apiAuth.NewHandler(authService)
 	userHandler := apiUser.NewHandler(userService)
 
-	s := gin.Default()
+	serv := gin.Default()
 	
-	//DO NOT ADD MIDDLEWARE
-	s.POST(authPath, authHandler.Auth)
+	serv.POST(authPath, authHandler.Auth)
 
-	//ADD AUTH MIDDLEWARE TO THIS ENDPOINTS
-	s.GET(infoPath, checkParamsMiddleware, userHandler.Info)
-	s.POST(sendCoinPath, checkParamsMiddleware, transactionHandler.SendCoin)
-	s.GET(buyItemPath, buyingHandler.Buy)
+	securedEndpoints := serv.Group("")
+	securedEndpoints.Use(middlewareAuth.JWTMiddleware(jwtConfig.Secret()))
+
+	securedEndpoints.GET(infoPath, middlewareParams.NoParamsMiddleware(), userHandler.Info)
+	securedEndpoints.POST(sendCoinPath, middlewareParams.NoParamsMiddleware(), transactionHandler.SendCoin)
+	securedEndpoints.GET(buyItemPath, buyingHandler.Buy)
 
 	//TODO: think of graceful shutdown handling
-	if err := s.Run(httpConfig.Address()); err != nil {
+	if err := serv.Run(httpConfig.Address()); err != nil {
 		log.Println("Server shutdown:", err)
 	}
 }

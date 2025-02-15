@@ -25,26 +25,25 @@ type pgConfig struct {
 }
 
 func NewPGConfig() (config.PGConfig, error) {
-	errorMessage := "%s is empty or not read"
 	host := os.Getenv(pgHostEnvName)
 	if len(host) == 0 {
-		return nil, errors.New(fmt.Sprintf(errorMessage, pgHostEnvName))
+		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, pgHostEnvName))
 	}
 	port := os.Getenv(pgPortEnvName)
 	if len(host) == 0 {
-		return nil, errors.New(fmt.Sprintf(errorMessage, pgPortEnvName))
+		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, pgPortEnvName))
 	}
 	user := os.Getenv(pgUserEnvName)
 	if len(host) == 0 {
-		return nil, errors.New(fmt.Sprintf(errorMessage, pgUserEnvName))
+		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, pgUserEnvName))
 	}
 	password := os.Getenv(pgPasswordEnvName)
 	if len(host) == 0 {
-		return nil, errors.New(fmt.Sprintf(errorMessage, pgPasswordEnvName))
+		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, pgPasswordEnvName))
 	}
 	dbname := os.Getenv(pgDatabaseEnvName)
 	if len(host) == 0 {
-		return nil, errors.New(fmt.Sprintf(errorMessage, pgDatabaseEnvName))
+		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, pgDatabaseEnvName))
 	}
 
 	return &pgConfig{

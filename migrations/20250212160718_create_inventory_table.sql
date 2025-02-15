@@ -3,7 +3,8 @@ CREATE TABLE inventory_ (
     id SERIAL PRIMARY KEY,
     id_user INTEGER NOT NULL REFERENCES user_(id) ON DELETE CASCADE,
     id_merch INTEGER NOT NULL REFERENCES merch_(id) ON DELETE CASCADE,
-    quantity INTEGER NOT NULL DEFAULT 1
+    quantity INTEGER NOT NULL DEFAULT 1,
+    CONSTRAINT unique_user_merch UNIQUE (id_user, id_merch)
 );
 
 INSERT INTO merch_ (title, price)

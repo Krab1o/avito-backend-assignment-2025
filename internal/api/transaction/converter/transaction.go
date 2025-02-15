@@ -6,18 +6,19 @@ import (
 )
 
 //TODO: implement sender addition in logic
-func TransactionDTOToService(dto *dto.Transaction) *model.Transaction {
+func TransactionDTOToService(dto *dto.Transaction, senderID int64) *model.Transaction {
 	return &model.Transaction{
+		FromUser: senderID,
 		ToUser: dto.ToUser,
 		Amount: dto.Amount,
 	}
 }
 
-//TODO: implement sender dropout in logic
-func TransactionServiceToDTO(model *model.Transaction) *dto.Transaction {
-	return &dto.Transaction{
-		ToUser: model.ToUser,
-		Amount: model.Amount,
-	}
-}
+// //TODO: implement sender dropout in logic
+// func TransactionServiceToDTO(model *model.Transaction) *dto.Transaction {
+// 	return &dto.Transaction{
+// 		ToUser: model.ToUser,
+// 		Amount: model.Amount,
+// 	}
+// }
 

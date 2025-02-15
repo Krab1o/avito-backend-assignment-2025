@@ -12,13 +12,13 @@ import (
 func (h *Handler) Info(c *gin.Context) {
 	ctx := c.Request.Context()
 	info, err := h.infoService.Info(ctx)
-	log.Println(info)
 	if err != nil {
 		log.Printf("Handler info: %v", err)
 		c.Header("Content-Type", "application/json")
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": api.ErrorInternalServerError})
+		c.JSON(http.StatusInternalServerError, gin.H{api.FieldError: api.ErrorInternalServerError})
 		return
 	}
+	//TODO: everything before is validation
 	dtoInfo := converter.InfoServiceToDTO(info)
 	c.JSON(http.StatusOK, dtoInfo)
 	return

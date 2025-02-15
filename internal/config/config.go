@@ -1,5 +1,7 @@
 package config
 
+const ErrorMessage = "%s is empty or not read"
+
 type HTTPConfig interface {
 	Address() string
 }
@@ -9,5 +11,6 @@ type PGConfig interface {
 }
 
 type JWTConfig interface {
-	Secret() string
+	Secret() []byte
+	Timeout() int
 }

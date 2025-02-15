@@ -2,6 +2,7 @@ package model
 
 //TODO: model can change
 type Transaction struct {
-	ToUser string
-	Amount int	
+	FromUser 	int64
+	ToUser 		string
+	Amount 		int	
 }
