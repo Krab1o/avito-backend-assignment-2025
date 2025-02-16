@@ -1,4 +1,4 @@
-package auth
+package middleware
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/api"
-	shared "github.com/Krab1o/avito-backend-assignment-2025/internal/shared/jwt"
+	"github.com/Krab1o/avito-backend-assignment-2025/internal/shared"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )

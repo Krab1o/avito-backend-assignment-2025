@@ -32,7 +32,4 @@ func UserServiceToRepo(user *model.User) (*repoModel.User, error) {
 	}, nil
 }
 
-//TODO: change model to serveModel in all places
-// func CredsRepoToService(creds *repoModel.UserCreds) (*model.UserCreds, error) {
-
-// }
+//TODO: maybe change model to serveModel in all places

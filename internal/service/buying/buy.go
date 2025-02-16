@@ -13,6 +13,7 @@ import (
 const defaultBuyQuantity = 1
 
 func (s *serv) Buy(ctx context.Context, newBuying *model.Buying) error {
+	//TODO: parallel with goroutines
 	merchRepo, err := s.merchRepo.GetItem(ctx, nil, newBuying.Name)
 	if err != nil {
 		return errs.NewServiceError(service.MessageInternalError, err)
@@ -20,20 +21,17 @@ func (s *serv) Buy(ctx context.Context, newBuying *model.Buying) error {
 	if merchRepo == nil {
 		return errs.NewNotFoundError(service.MessageMerchNotFound, err)
 	}
+	//Buyer always exist because we checked his JWT token
 	userRepo, err := s.userRepo.GetUserByID(ctx, nil, newBuying.BuyerID)
 	if err != nil {
 		return errs.NewServiceError(service.MessageInternalError, err)
-	}
-	if merchRepo == nil {
-		return errs.NewNotFoundError(service.MessageUserNotFound, err)
 	}
 	buyingRepo := converter.NewBuying(
 		merchRepo.ID,
 		userRepo.ID,
 		defaultBuyQuantity,
 	)
-	return s.userRepo.WithTransaction(ctx, func (tx pgx.Tx) error {
-		var err error
+	return s.userRepo.WithTransaction(ctx, func (tx pgx.Tx) error {	
 		if userRepo.Coins < merchRepo.Price {
 			return errs.NewSemanticError(service.MessageNotEnoughCoins, err)
 		}

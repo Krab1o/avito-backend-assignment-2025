@@ -14,16 +14,15 @@ func (s *serv) Info(ctx context.Context, id int64) (*model.Info, error) {
 	if err != nil {
 		return nil, errs.NewServiceError(service.MessageInternalError, err)
 	}
-	// log.Println(sendTrRepo)
 	receiverTrRepo, err := s.transactionRepo.GetTransactionsByReceiverID(ctx, nil, id)
 	if err != nil {
 		return nil, errs.NewServiceError(service.MessageInternalError, err)
 	}
-	// log.Println(receiverTrRepo)
 	inventory, err := s.inventoryRepo.GetInventoryByID(ctx, nil, id)
 	if err != nil {
 		return nil, errs.NewServiceError(service.MessageInternalError, err)
 	}
+	//user cannot be null because we it exists (id from token)
 	user, err := s.userRepo.GetUserByID(ctx, nil, id)
 	if err != nil {
 		return nil, errs.NewServiceError(service.MessageInternalError, err)

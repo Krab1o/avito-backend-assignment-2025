@@ -10,4 +10,6 @@ const (
 	MessageMerchNotFound = "Merch not found"
 	MessageUnauthorized = "Unauthorized"
 	MessageUserNotFound = "Not existing user"
+	MessageSenderNotFound = "Sender not found"
+	MessageReceiverNotFound = "Receiver not found"
 )

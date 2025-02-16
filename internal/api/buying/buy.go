@@ -1,7 +1,6 @@
 package buying
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/api"
@@ -10,24 +9,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) Buy(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-	buyerID := api.ConversionID(c)
-	ctx := c.Request.Context()
-	newBuying := &dto.Buying{
+func BuyingValidation(c *gin.Context) *dto.Buying {
+	buying := &dto.Buying{
 		Name: c.Param(api.ParamBuying),
 	}
-	if newBuying.Name == "" {
+	if buying.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{api.FieldError: api.ErrorNoParamSpecified})
+		return nil
 	}
+	return buying
+}
 
-	//TODO: everything before is validation
-	model := converter.BuyingDTOToService(newBuying, buyerID)
-	err := h.buyingService.Buy(ctx, model)
-	log.Println("hehe", err)
+func (h *Handler) Buy(c *gin.Context) {
+	buyerID, err := api.GetTokenID(c)
 	if err != nil {
-		api.HandleServiceError(c, err)
-		// c.JSON(http.StatusInternalServerError, gin.H{api.ErrorField: api.ErrorInternalServerError})
+		api.HandleError(c, err)
+		return
+	}
+	ctx := c.Request.Context()
+	buying := BuyingValidation(c) 
+	if buying == nil {
+		return
+	}
+	model := converter.BuyingDTOToService(buying, buyerID)
+	err = h.buyingService.Buy(ctx, model)
+	if err != nil {
+		api.HandleError(c, err)
 		return
 	}
 	return

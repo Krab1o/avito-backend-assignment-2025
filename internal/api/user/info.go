@@ -8,14 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//TODO: add validation
 func (h *Handler) Info(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-	id := api.ConversionID(c)
+	id, err := api.GetTokenID(c)
+	if err != nil {
+		api.HandleError(c, err)
+	}
 	ctx := c.Request.Context()
 	infoService, err := h.infoService.Info(ctx, id)
 	if err != nil {
-		api.HandleServiceError(c, err)
+		api.HandleError(c, err)
 		return
 	}
 	infoDTO := converter.InfoServiceToDTO(infoService)

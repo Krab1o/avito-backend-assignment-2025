@@ -2,39 +2,14 @@ package auth
 
 import (
 	"context"
-	"log"
-	"time"
 
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/service"
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/auth/converter"
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/auth/model"
 	errs "github.com/Krab1o/avito-backend-assignment-2025/internal/shared/errors"
-	shared "github.com/Krab1o/avito-backend-assignment-2025/internal/shared/jwt"
-	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 )
 
-const startCoins = 1000
-
-func generateJWT(userID int64, jwtSecret []byte, jwtTimeout int) (string, error) {
-    expirationTime := time.Now().Add(time.Duration(jwtTimeout) * time.Minute)
-    claims := shared.Claims{
-        UserID: userID,
-        RegisteredClaims: jwt.RegisteredClaims{
-            ExpiresAt: jwt.NewNumericDate(expirationTime),
-            IssuedAt:  jwt.NewNumericDate(time.Now()),
-            Subject:   "user_auth",
-        },
-    }
-
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    return token.SignedString(jwtSecret)
-}
-
-func verifyPassword(hashedPassword string, candidatePassword string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(candidatePassword))
-	return err == nil
-}
+const StartCoins = 1000
 
 // Concerns separation violation for the sake of efficiency
 func (s *serv) Auth(ctx context.Context, userCreds *model.UserCreds) (string, error) {
@@ -46,7 +21,7 @@ func (s *serv) Auth(ctx context.Context, userCreds *model.UserCreds) (string, er
 	if repoData == nil {
 		newUser := &model.User{
 			Creds: userCreds,
-			Coins: startCoins,
+			Coins: StartCoins,
 		}
 		newUserRepo, err := converter.UserServiceToRepo(newUser)
 		if err != nil {
@@ -57,7 +32,7 @@ func (s *serv) Auth(ctx context.Context, userCreds *model.UserCreds) (string, er
 			return "", errs.NewServiceError(service.MessageInternalError, err)
 		}
 	} else {
-		ok := verifyPassword(
+		ok := s.authHelper.VerifyPassword(
 			repoData.Creds.PasswordHash,
 			userCreds.Password,
 		)
@@ -66,8 +41,7 @@ func (s *serv) Auth(ctx context.Context, userCreds *model.UserCreds) (string, er
 		}
 		jwtUserID = repoData.ID
 	}
-	log.Println(s.jwtConfig.Timeout())
-	token, err := generateJWT(jwtUserID, s.jwtConfig.Secret(), s.jwtConfig.Timeout())
+	token, err := s.authHelper.GenerateJWT(jwtUserID, s.jwtConfig.Secret(), s.jwtConfig.Timeout())
 	if err != nil {
 		return "", errs.NewServiceError(service.MessageInternalError, err)
 	}

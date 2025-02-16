@@ -9,22 +9,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//TODO: validation
-func (h *Handler) Auth(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-	ctx := c.Request.Context()
+func CredsValidation(c *gin.Context) *dto.UserCreds {
 	creds := &dto.UserCreds{}
 	err := c.ShouldBindJSON(creds)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{api.FieldError: api.ErrorBadRequest})
+		return nil
+	}
+	if creds.Password == "" || creds.Username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{api.FieldError: api.ErrorBadRequest})
+		return nil
+	}
+	return creds
+}
+
+func (h *Handler) Auth(c *gin.Context) {
+	ctx := c.Request.Context()
+	creds := CredsValidation(c)
+	if creds == nil {
 		return
 	}
-	// everything before is validation
 	serviceCreds := converter.CredsDTOToService(creds)
 	token, err := h.authService.Auth(ctx, serviceCreds)
 	if err != nil {
-		api.HandleServiceError(c, err)
-		// c.JSON(http.StatusUnauthorized, gin.H{api.ErrorField: api.ErrorUnauthorized})
+		api.HandleError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{api.FieldToken: token})

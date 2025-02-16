@@ -3,7 +3,6 @@ package transaction
 import (
 	"context"
 
-	repoModel "github.com/Krab1o/avito-backend-assignment-2025/internal/repository/user/model"
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/service"
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/transaction/converter"
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/service/transaction/model"
@@ -12,33 +11,31 @@ import (
 )
 
 func (s *serv) SendCoin(ctx context.Context, newTransaction *model.Transaction) error {	
-	var sender *repoModel.User
-	var receiver *repoModel.User
-	return s.userRepo.WithTransaction(ctx, func(tx pgx.Tx) error {
-		var err error
-		//TODO: better do using goroutines (parallel reading)
-		receiver, err = s.userRepo.GetUserByUsername(ctx, tx, newTransaction.ToUser)
-		if err != nil {
-			return errs.NewServiceError(service.MessageInternalError, err)
-		}
-		sender, err = s.userRepo.GetUserByID(ctx, tx, newTransaction.FromUser)
-		if err != nil {
-			return errs.NewServiceError(service.MessageInternalError, err)
-		}
+	//TODO: better do using goroutines (parallel reading)
+	receiver, err := s.userRepo.GetUserByUsername(ctx, nil, newTransaction.ToUser)
+	if err != nil {
+		return errs.NewServiceError(service.MessageInternalError, err)
+	}
+	if receiver == nil {
+		return errs.NewNotFoundError(service.MessageReceiverNotFound, err)
+	}
+	// No need to check sender because of assumption that it sent valid token
+	sender, err := s.userRepo.GetUserByID(ctx, nil, newTransaction.FromUser)
+	if err != nil {
+		return errs.NewServiceError(service.MessageInternalError, err)
+	}
+	return s.userRepo.WithTransaction(ctx, func(tx pgx.Tx) error {		
+		//Business logic check
 		if receiver == nil || sender == nil {
 			return errs.NewSemanticError(service.MessageUserNotFound, err)
 		}
-		//business logic check
-		//TODO: maybe move to validation
 		if sender.Coins < newTransaction.Amount {
 			return errs.NewSemanticError(service.MessageNotEnoughCoins, err)
-		}
-		if newTransaction.Amount <= 0 {
-			return errs.NewSemanticError(service.MessageZeroTransfer, err)
 		}
 		if sender.ID == receiver.ID {
 			return errs.NewSemanticError(service.MessageSelfSending, err)
 		}
+		//Continue transaction
 		err = s.userRepo.SubtractCoins(ctx, tx, sender, newTransaction.Amount)
 		if err != nil {
 			return errs.NewServiceError(service.MessageInternalError, err)

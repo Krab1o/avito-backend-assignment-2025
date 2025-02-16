@@ -3,7 +3,6 @@ package inventory
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/repository"
 	"github.com/Krab1o/avito-backend-assignment-2025/internal/repository/inventory/model"
@@ -34,7 +33,6 @@ func (r *repo) GetInventoryByID(ctx context.Context, tx pgx.Tx, ownerID int64) (
 	if err != nil {
 		return nil, errs.NewDBError(err.Error(), err)
 	}
-	log.Println(query, args)
 	var rows pgx.Rows
 	if tx != nil {
 		rows, err = tx.Query(ctx, query, args...)

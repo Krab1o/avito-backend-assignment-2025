@@ -9,23 +9,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//TODO: add validation middleware
-func (h *Handler) SendCoin(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
-	senderID := api.ConversionID(c)
-	ctx := c.Request.Context()
-	newTransaction := &dto.Transaction{}
-	err := c.ShouldBindJSON(newTransaction)
+func TransactionValidation(c *gin.Context) *dto.Transaction {
+	tx := &dto.Transaction{}
+	err := c.ShouldBindJSON(tx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{api.FieldError: api.ErrorBadRequest})
+		return nil
+	}
+	if tx.Amount <= 0 || tx.ToUser == "" {
+		c.JSON(http.StatusBadRequest, gin.H{api.FieldError: api.ErrorBadRequest})
+		return nil
+	}
+	return tx
+}
+
+func (h *Handler) SendCoin(c *gin.Context) {
+	ctx := c.Request.Context()
+	senderID, err := api.GetTokenID(c)
+	if err != nil {
+		api.HandleError(c, err)
+	}
+	tx := TransactionValidation(c)
+	if tx == nil {
 		return
 	}
-	//TODO: everything before is validation
-	model := converter.TransactionDTOToService(newTransaction, senderID)
+	model := converter.TransactionDTOToService(tx, senderID)
 	err = h.transactionService.SendCoin(ctx, model)
 	if err != nil {
-		api.HandleServiceError(c, err)
-		// c.JSON(http.StatusInternalServerError, gin.H{api.ErrorField: api.ErrorInternalServerError})
+		api.HandleError(c, err)
 		return
 	}
 	c.Status(http.StatusOK)

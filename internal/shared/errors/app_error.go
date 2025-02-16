@@ -34,10 +34,6 @@ func NewNotFoundError(msg string, err error) *AppError {
 	return newAppError(NotFound, msg, err)
 }
 
-func NewBadRequestError(msg string, err error) *AppError {
-	return newAppError(BadRequest, msg, err)
-}
-
 func NewUnauthorizedError(msg string, err error) *AppError {
 	return newAppError(Unauthorized, msg, err)
 }

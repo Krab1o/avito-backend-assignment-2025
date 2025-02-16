@@ -9,7 +9,6 @@ const (
 	// Service layer errors
 	SemanticError // ошибка логики действия (например, передача денег самому себе)
 	NotFound // какой-либо ресурс не найден
-	BadRequest // неправильный формат запроса
 	Unauthorized // не авторизован
 	ServiceError // другая ошибка сервисного слоя
 )
@@ -23,8 +22,6 @@ func (e ErrorType) String() string {
 		return "Semantic Error"
 	case NotFound:
 		return "Not Found Error"
-	case BadRequest:
-		return "Bad Request Error"
 	case Unauthorized:
 		return "Authorization Error"
 	case ServiceError:

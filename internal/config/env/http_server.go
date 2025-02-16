@@ -10,31 +10,36 @@ import (
 )
 
 const (
-	httpHostEnvName = "HTTP_HOST"
+	httpHostAccessEnvName = "ACCESS_HOST"
 	httpPortEnvName = "HTTP_PORT"
 )
 
 type httpConfig struct {
-	Host	string
-	Port	string
+	host	string
+	port	string
 }
 
 func NewHTTPConfig() (config.HTTPConfig, error) {
-	host := os.Getenv(httpHostEnvName)
+	host := os.Getenv(httpHostAccessEnvName)
 	if len(host) == 0 {
-		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, httpHostEnvName))
+		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, httpHostAccessEnvName))
 	}
+	
 	port := os.Getenv(httpPortEnvName)
 	if len(port) == 0 {
 		return nil, errors.New(fmt.Sprintf(config.ErrorMessage, httpPortEnvName))
 	}
 	
 	return &httpConfig{
-		Host: host,
-		Port: port,
+		host: host,
+		port: port,
 	}, nil
 }
 
-func (c *httpConfig) Address() string {
-	return net.JoinHostPort(c.Host, c.Port)
+func (c *httpConfig) Port() string {
+	return fmt.Sprintf(":%s", c.port)
+}
+
+func (c *httpConfig) AccessAddress() string {
+	return net.JoinHostPort(c.host, c.port)
 }

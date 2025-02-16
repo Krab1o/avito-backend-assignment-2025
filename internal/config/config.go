@@ -3,7 +3,8 @@ package config
 const ErrorMessage = "%s is empty or not read"
 
 type HTTPConfig interface {
-	Address() string
+	Port() string
+	AccessAddress() string
 }
 
 type PGConfig interface {
