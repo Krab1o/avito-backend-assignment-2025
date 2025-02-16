@@ -5,7 +5,7 @@ export PATH := $(LOCAL_BIN):$(PATH)
 
 LOCAL_INTEGRATION_TEST_DIR="./integration_test"
 LOCAL_MIGRATION_DIR=$(MIGRATION_DIR)
-LOCAL_MIGRATION_DSN="host=$(PG_HOST) port=$(PG_PORT) dbname=$(PG_DB) user=$(PG_USER) password=$(PG_PASSWORD)"
+LOCAL_MIGRATION_DSN="host=$(ACCESS_HOST) port=$(PG_PORT) dbname=$(PG_DB) user=$(PG_USER) password=$(PG_PASSWORD)"
 # LOCAL_MIGRATION_DSN="postgres://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DB}"
 
 install-deps:
